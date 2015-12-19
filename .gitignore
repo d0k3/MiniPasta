@@ -1,3 +1,13 @@
+# Project specific files
+arm9payload.bin
+arm9payload.elf
+MiniPasta.3dsx
+MiniPasta.smdh
+MiniPasta.elf
+\arm9payload\build
+\build
+
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
