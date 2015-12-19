@@ -33,7 +33,7 @@ DATA		:=	data
 INCLUDES	:=	include
 APP_TITLE	:=	miniPasta
 APP_DESCRIPTION :=	Simple, safe, no-firmlaunch Pasta
-APP_AUTHOR	:=	zoogie
+APP_AUTHOR	:=	Team Pasta
 
 #---------------------------------------------------------------------------------
 # options for code generation
