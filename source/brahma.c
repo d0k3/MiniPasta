@@ -42,7 +42,7 @@ s32 get_exploit_data (struct exploit_data *data) {
 		return result;
 
 	fversion = osGetFirmVersion();
-	APT_CheckNew3DS(NULL, &isN3DS);
+	APT_CheckNew3DS(&isN3DS);
 	sysmodel = isN3DS ? SYS_MODEL_NEW_3DS : SYS_MODEL_OLD_3DS;
 
 	/* copy platform and firmware dependent data */
@@ -194,21 +194,14 @@ void exploit_arm9_race_condition (void) {
 	}
 	return;
 }
-GSP_FramebufferInfo topFramebufferInfo, bottomFramebufferInfo;
+u32 frameBufferData[3];
 
 /* restore svcCreateThread code (not really required,
    but just to be on the safe side) */
 s32 priv_firm_reboot (void) {
 	asm volatile ("cpsid aif");
 	u32 *save = (u32 *)(g_expdata.va_fcram_base + 0x3FFFE00);  
-    save[0] = topFramebufferInfo.framebuf0_vaddr;  
-   	save[1] = topFramebufferInfo.framebuf1_vaddr;  
-	save[2] = bottomFramebufferInfo.framebuf0_vaddr;  
-
-// Working around a GCC bug to translate the va address to pa... 
-    save[0] += 0xC000000;  // (pa FCRAM address - va FCRAM address) 
-    save[1] += 0xC000000; 
-    save[2] += 0xC000000; 
+	memcpy(save, frameBufferData, sizeof(u32) * sizeof(frameBufferData));
 
 	exploit_arm9_race_condition();
 	return 0;
@@ -218,6 +211,15 @@ s32 priv_firm_reboot (void) {
    function. otherwise, calling this function simply reboots
    the handheld */
 s32 firm_reboot (void) {
+	// Make sure gfx is initialized
+	gfxInitDefault();
+
+	// Save the framebuffers for arm11.
+	frameBufferData[0] = (u32)gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL) + 0xC000000;
+	frameBufferData[1] = (u32)gfxGetFramebuffer(GFX_TOP, GFX_RIGHT, NULL, NULL) + 0xC000000;
+	frameBufferData[2] = (u32)gfxGetFramebuffer(GFX_BOTTOM, 0, NULL, NULL) + 0xC000000;
+	gfxSwapBuffers();
+
 	s32 fail_stage = 0;
 	
 	fail_stage++; /* platform or firmware not supported, ARM11 exploit failure */
