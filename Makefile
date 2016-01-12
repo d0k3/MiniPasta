@@ -30,6 +30,7 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source source/libkhax
 DATA		:=	data
+PAYLOAD		:=	arm9payload
 INCLUDES	:=	include
 APP_TITLE	:=	miniPasta
 APP_DESCRIPTION :=	Simple, safe, no-firmlaunch Pasta
@@ -130,6 +131,8 @@ $(BUILD):
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf
+	@rm -fr $(DATA)
+	@$(MAKE) --no-print-directory -C $(PAYLOAD) clean
 
 
 #---------------------------------------------------------------------------------
