@@ -117,10 +117,15 @@ else
 	export APP_ICON := $(TOPDIR)/$(ICON)
 endif
 
-.PHONY: $(BUILD) clean all
+.PHONY: $(PAYLOAD) $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
-all: $(BUILD)
+all: $(PAYLOAD).bin $(BUILD)
+
+$(PAYLOAD).bin:
+	@make --no-print-directory -C $(PAYLOAD) -f $(CURDIR)/$(PAYLOAD)/Makefile
+	@[ -d $(DATA) ] || mkdir -p $(DATA)
+	@cp $(PAYLOAD)/$(PAYLOAD).bin $(DATA)
 
 $(BUILD):
 	@echo $(SFILES)
