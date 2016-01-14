@@ -30,6 +30,7 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source source/libkhax
 DATA		:=	data
+PAYLOAD		:=	arm9payload
 INCLUDES	:=	include
 APP_TITLE	:=	miniPasta
 APP_DESCRIPTION :=	Simple, safe, no-firmlaunch Pasta
@@ -78,7 +79,7 @@ export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*))) $(PAYLOAD).bin
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -116,10 +117,15 @@ else
 	export APP_ICON := $(TOPDIR)/$(ICON)
 endif
 
-.PHONY: $(BUILD) clean all
+.PHONY: $(PAYLOAD) $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
-all: $(BUILD)
+all: $(PAYLOAD).bin $(BUILD)
+
+$(PAYLOAD).bin:
+	@make --no-print-directory -C $(PAYLOAD) -f $(CURDIR)/$(PAYLOAD)/Makefile
+	@[ -d $(DATA) ] || mkdir -p $(DATA)
+	@cp $(PAYLOAD)/$(PAYLOAD).bin $(DATA)
 
 $(BUILD):
 	@echo $(SFILES)
@@ -130,6 +136,8 @@ $(BUILD):
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf
+	@rm -fr $(DATA)
+	@$(MAKE) --no-print-directory -C $(PAYLOAD) clean
 
 
 #---------------------------------------------------------------------------------
