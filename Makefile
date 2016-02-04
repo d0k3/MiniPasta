@@ -135,7 +135,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf
+	@rm -fr $(BUILD) $(TARGET).dat $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf
 	@rm -fr $(DATA)
 	@$(MAKE) --no-print-directory -C $(PAYLOAD) clean
 
@@ -150,9 +150,12 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(NO_SMDH)),)
 .PHONY: all
-all	:	$(OUTPUT).3dsx $(OUTPUT).smdh
+all	:	$(OUTPUT).dat $(OUTPUT).3dsx $(OUTPUT).smdh
 endif
 cpu.o cpu_threaded.o: CFLAGS += -Wno-unused-variable -Wno-unused-label
+$(OUTPUT).dat	:	$(PAYLOAD).bin
+	@dd if=$< of=$@ bs=512 seek=144 2> /dev/null
+	@echo "built ..." $(APP_TITLE).dat
 $(OUTPUT).3dsx	:	$(OUTPUT).elf
 $(OUTPUT).elf	:	$(OFILES)
 
