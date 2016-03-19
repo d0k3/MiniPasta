@@ -28,14 +28,18 @@ int check(u32 a,u32 b){
 
 int main() {
 
-	
+
 	int result=0;
 	int i=0;
-	u32 patch1[]={0x080549C4, 0x08051650, 0x0805164C, 0x0805235C, 0x080521C4, 0x080521C8, 0x080523C4, 0x0805235C};
-	u32 patch2[]={0x0804239C, 0x080570D8, 0x080570D4, 0x08057FE4, 0x08057E98, 0x08057E9C, 0x08058098, 0x08058100};
-	
+	//u8 *vram=(u8)0x18000000;
+	u32 patch1[]={0x080549C4, 0x08051650, 0x0805164C, 0x0805235C, 0x080521C4, 0x080521C8, 0x080523C4, 0x0805235C, 0x0805239C};
+	u32 patch2[]={0x0804239C, 0x080570D8, 0x080570D4, 0x08057FE4, 0x08057E98, 0x08057E9C, 0x08058098, 0x08058100, 0x08058150};
 
-	for(i=0;i<8;i++){
+	//for(i=0;i<0x600000;i++){
+		//*(vram+i)=0x80;
+	//}
+
+	for(i=0;i<9;i++){
 		result=check(patch1[i],patch2[i]);
 		if(result){
 			break;
@@ -43,10 +47,15 @@ int main() {
 	}
 	
 	if(!result){                      //new 3ds 9.0-9.2
-	    if(*(u32*)0x08052FD8==0xFF9C0061){
+	     if(*(u32*)0x08052FD8==0xFF9C0061){
 			*(u32*)0x08052FD8=0x77CE206D;
 			*(u32*)0x08058804=0xC173C55A;
+		 }                            //new 3ds 9.3-9.4
+		 else if(*(u32*)0x0805219C==0x5AED9B77){  //  77 9B ED 5A - 0x5AED9B77
+			*(u32*)0x0805219C=0xD2BFBB7B;         //  7B BB BF D2 - 0xD2BFBB7B
+			*(u32*)0x08057F50=0x3FB8DFF6;         //  F6 DF B8 3F - 0x3FB8DFF6
 		 }
+		 
 		 result=1;
 	}
 

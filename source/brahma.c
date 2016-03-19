@@ -3,13 +3,16 @@
 #include <stdio.h>
 #include "brahma.h"
 #include "exploitdata.h"
-#include "libkhax/khax.h"
+#include "libkhax/libsu.h"
+//#include "libkhax/khax.h"
 
 
 /* should be the very first call. allocates heap buffer
    for ARM9 payload */ 
 u32 brahma_init (void) {
-	g_ext_arm9_buf = memalign(0x1000, ARM9_PAYLOAD_MAX_SIZE);
+	g_ext_arm9_buf = memalign(0x1000, 0x10000);
+	//g_ext_arm9_buf=(u8*)malloc(0x10000);
+	
 	return (g_ext_arm9_buf != 0);	
 }
 
@@ -54,6 +57,7 @@ s32 get_exploit_data (struct exploit_data *data) {
 				break;
 		}
 	}
+	
 	return result;
 }
 
@@ -212,20 +216,28 @@ s32 priv_firm_reboot (void) {
    the handheld */
 s32 firm_reboot (void) {
 	// Make sure gfx is initialized
-	gfxInitDefault();
+	
+	
+	//gfxInitDefault();
 
 	// Save the framebuffers for arm11.
 	frameBufferData[0] = (u32)gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL) + 0xC000000;
 	frameBufferData[1] = (u32)gfxGetFramebuffer(GFX_TOP, GFX_RIGHT, NULL, NULL) + 0xC000000;
 	frameBufferData[2] = (u32)gfxGetFramebuffer(GFX_BOTTOM, 0, NULL, NULL) + 0xC000000;
 	gfxSwapBuffers();
+	
+	/*
+	frameBufferData[0] = 0;
+	frameBufferData[1] = 0;
+	frameBufferData[2] = 0;
+	*/
 
 	s32 fail_stage = 0;
 	
 	fail_stage++; /* platform or firmware not supported, ARM11 exploit failure */
 	if (setup_exploit_data()) {
 		fail_stage++; /* failure while trying to corrupt svcCreateThread() */
-		if (khaxInit() == 0) {
+		if (1) {
 			fail_stage++; /* Firmlaunch failure, ARM9 exploit failure*/
 			svcBackdoor(priv_firm_reboot);
 		}
