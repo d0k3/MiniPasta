@@ -32,7 +32,7 @@ SOURCES		:=	source source/libkhax
 DATA		:=	data
 PAYLOAD		:=	arm9payload
 INCLUDES	:=	include
-APP_TITLE	:=	miniPasta
+APP_TITLE	:=	miniPasta2
 APP_DESCRIPTION :=	Simple, safe, no-firmlaunch Pasta
 APP_AUTHOR	:=	Team Pasta
 
